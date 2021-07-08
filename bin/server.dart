@@ -49,12 +49,16 @@ Future<void> main(List<String> args) async {
 
   final port = toInt(results['port']?.toString()) ?? 50051;
 
-  final server = Server([PianoService()]);
+  final server = Server(
+    [PianoService()],
+    const <Interceptor>[],
+    CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
+  );
   await server.serve(port: port);
   print('Server listening on port ${server.port}...');
 }
 
-ArgResults parseArgs(List<String> args) {
+ArgResults? parseArgs(List<String> args) {
   final parser = ArgParser();
   parser.addFlag('help', abbr: 'h');
   parser.addOption('port', abbr: 'p', help: 'Port number to listen on');
@@ -68,6 +72,6 @@ ArgResults parseArgs(List<String> args) {
   return results;
 }
 
-int toInt(String text) {
+int? toInt(String? text) {
   return text == null ? null : int.parse(text);
 }
