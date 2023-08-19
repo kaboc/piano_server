@@ -27,7 +27,7 @@ class PianoService extends PianoServiceBase {
           controller.sink.add(req);
         }
       });
-    }).onError((dynamic e) {
+    }).onError((Object? e) {
       print(e);
 
       _controllers.remove(clientController);
@@ -38,6 +38,8 @@ class PianoService extends PianoServiceBase {
     await for (final req in clientController.stream) {
       yield Note()..pitch = req.pitch;
     }
+
+    print('aaa');
   }
 }
 
@@ -49,19 +51,19 @@ Future<void> main(List<String> args) async {
 
   final port = toInt(results['port']?.toString()) ?? 50051;
 
-  final server = Server(
-    [PianoService()],
-    const <Interceptor>[],
-    CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
+  final server = Server.create(
+    services: [PianoService()],
+    codecRegistry: CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
   );
   await server.serve(port: port);
   print('Server listening on port ${server.port}...');
 }
 
 ArgResults? parseArgs(List<String> args) {
-  final parser = ArgParser();
-  parser.addFlag('help', abbr: 'h');
-  parser.addOption('port', abbr: 'p', help: 'Port number to listen on');
+  final parser = ArgParser()
+    ..addFlag('help', abbr: 'h')
+    ..addOption('port', abbr: 'p', help: 'Port number to listen on');
+
   final results = parser.parse(args);
 
   if (results['help'] == true) {
